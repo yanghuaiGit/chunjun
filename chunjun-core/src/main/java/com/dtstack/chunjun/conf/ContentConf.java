@@ -17,9 +17,6 @@
  */
 package com.dtstack.chunjun.conf;
 
-import com.dtstack.chunjun.cdc.CdcConf;
-import com.dtstack.chunjun.mapping.MappingConf;
-
 import java.io.Serializable;
 
 /**
@@ -33,10 +30,6 @@ public class ContentConf implements Serializable {
     private OperatorConf reader;
     private OperatorConf writer;
     private TransformerConf transformer;
-    private MappingConf nameMapping;
-    /** cdc restore conf */
-    private CdcConf restoration = new CdcConf();
-
     public OperatorConf getReader() {
         return reader;
     }
@@ -61,22 +54,6 @@ public class ContentConf implements Serializable {
         this.transformer = transformer;
     }
 
-    public MappingConf getNameMapping() {
-        return nameMapping;
-    }
-
-    public void setNameMapping(MappingConf nameMapping) {
-        this.nameMapping = nameMapping;
-    }
-
-    public CdcConf getRestoration() {
-        return restoration;
-    }
-
-    public void setRestoration(CdcConf restoration) {
-        this.restoration = restoration;
-    }
-
     @Override
     public String toString() {
         return "ContentConf{"
@@ -86,10 +63,6 @@ public class ContentConf implements Serializable {
                 + writer
                 + ", transformer="
                 + transformer
-                + ", nameMapping="
-                + nameMapping
-                + ", restoration="
-                + restoration
                 + '}';
     }
 }

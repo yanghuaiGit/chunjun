@@ -18,11 +18,6 @@
 
 package com.dtstack.chunjun.sink.format;
 
-import com.dtstack.chunjun.cdc.DdlRowData;
-import com.dtstack.chunjun.cdc.conf.DDLConf;
-import com.dtstack.chunjun.cdc.exception.LogExceptionHandler;
-import com.dtstack.chunjun.cdc.handler.DDLHandler;
-import com.dtstack.chunjun.cdc.utils.ExecutorUtils;
 import com.dtstack.chunjun.conf.ChunJunCommonConf;
 import com.dtstack.chunjun.constants.Metrics;
 import com.dtstack.chunjun.converter.AbstractRowConverter;
@@ -39,7 +34,6 @@ import com.dtstack.chunjun.sink.DirtyDataManager;
 import com.dtstack.chunjun.throwable.ChunJunRuntimeException;
 import com.dtstack.chunjun.throwable.NoRestartException;
 import com.dtstack.chunjun.throwable.WriteRecordException;
-import com.dtstack.chunjun.util.DataSyncFactoryUtil;
 import com.dtstack.chunjun.util.ExceptionUtil;
 import com.dtstack.chunjun.util.JsonUtil;
 
@@ -173,13 +167,10 @@ public abstract class BaseRichOutputFormat extends RichOutputFormat<RowData>
     /** 是否执行ddl语句 * */
     protected boolean executeDdlAble;
 
-    protected DDLConf ddlConf;
-
-    protected DDLHandler ddlHandler;
-
     protected ExecutorService executorService;
 
-    @VisibleForTesting protected boolean useAbstractColumn;
+    @VisibleForTesting
+    protected boolean useAbstractColumn;
 
     private transient volatile Exception timerWriteException;
 
@@ -203,6 +194,7 @@ public abstract class BaseRichOutputFormat extends RichOutputFormat<RowData>
      *
      * @param taskNumber 任务索引id
      * @param numTasks 子任务数量
+     *
      * @throws IOException
      */
     @Override
@@ -214,23 +206,6 @@ public abstract class BaseRichOutputFormat extends RichOutputFormat<RowData>
         this.batchSize = config.getBatchSize();
         this.rows = new ArrayList<>(batchSize);
         this.executeDdlAble = config.isExecuteDdlAble();
-        if (executeDdlAble) {
-            ddlHandler = DataSyncFactoryUtil.discoverDdlHandler(ddlConf);
-            try {
-                ddlHandler.init(ddlConf.getProperties());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-            executorService =
-                    ExecutorUtils.threadPoolExecutor(
-                            2,
-                            10,
-                            0,
-                            Integer.MAX_VALUE,
-                            "ddl-executor-pool-%d",
-                            true,
-                            new LogExceptionHandler());
-        }
         this.flushIntervalMills = config.getFlushIntervalMills();
         this.flushEnable = new AtomicBoolean(true);
         this.semantic = Semantic.getByName(config.getSemantic());
@@ -277,19 +252,15 @@ public abstract class BaseRichOutputFormat extends RichOutputFormat<RowData>
     public synchronized void writeRecord(RowData rowData) {
         checkTimerWriteException();
         int size = 0;
-        if (rowData instanceof DdlRowData) {
-            executeDdlRowDataTemplate((DdlRowData) rowData);
+
+        if (batchSize <= 1) {
+            writeSingleRecord(rowData, numWriteCounter);
             size = 1;
         } else {
-            if (batchSize <= 1) {
-                writeSingleRecord(rowData, numWriteCounter);
-                size = 1;
-            } else {
-                rows.add(rowData);
-                if (rows.size() >= batchSize) {
-                    writeRecordInternal();
-                    size = batchSize;
-                }
+            rows.add(rowData);
+            if (rows.size() >= batchSize) {
+                writeRecordInternal();
+                size = batchSize;
             }
         }
         updateDuration();
@@ -371,7 +342,8 @@ public abstract class BaseRichOutputFormat extends RichOutputFormat<RowData>
     }
 
     @Override
-    public void tryCleanupOnError() throws Exception {}
+    public void tryCleanupOnError() throws Exception {
+    }
 
     /** 初始化累加器指标 */
     protected void initStatisticsAccumulator() {
@@ -522,6 +494,7 @@ public abstract class BaseRichOutputFormat extends RichOutputFormat<RowData>
      *
      * @param pos 异常字段索引
      * @param rowData 当前读取的数据
+     *
      * @return 脏数据异常信息记录
      */
     protected String recordConvertDetailErrorMessage(int pos, Object rowData) {
@@ -570,35 +543,21 @@ public abstract class BaseRichOutputFormat extends RichOutputFormat<RowData>
         return formatState;
     }
 
-    private void executeDdlRowDataTemplate(DdlRowData ddlRowData) {
-        try {
-            preExecuteDdlRowData(ddlRowData);
-            if (executeDdlAble) {
-                executeDdlRowData(ddlRowData);
-            }
-        } catch (Exception e) {
-            LOG.error("execute ddl {} error", ddlRowData);
-            throw new RuntimeException(e);
-        }
-    }
 
-    protected void preExecuteDdlRowData(DdlRowData rowData) throws Exception {}
-
-    protected void executeDdlRowData(DdlRowData ddlRowData) throws Exception {
-        throw new UnsupportedOperationException("not support execute ddlRowData");
-    }
 
     /**
      * pre commit data
      *
      * @throws Exception
      */
-    protected void preCommit() throws Exception {}
+    protected void preCommit() throws Exception {
+    }
 
     /**
      * 写出单条数据
      *
      * @param rowData 数据
+     *
      * @throws WriteRecordException
      */
     protected abstract void writeSingleRecordInternal(RowData rowData) throws WriteRecordException;
@@ -615,6 +574,7 @@ public abstract class BaseRichOutputFormat extends RichOutputFormat<RowData>
      *
      * @param taskNumber 通道索引
      * @param numTasks 通道数量
+     *
      * @throws IOException
      */
     protected abstract void openInternal(int taskNumber, int numTasks) throws IOException;
@@ -648,9 +608,11 @@ public abstract class BaseRichOutputFormat extends RichOutputFormat<RowData>
      * commit data
      *
      * @param checkpointId
+     *
      * @throws Exception
      */
-    public void commit(long checkpointId) throws Exception {}
+    public void commit(long checkpointId) throws Exception {
+    }
 
     /**
      * checkpoint失败时操作
@@ -675,9 +637,11 @@ public abstract class BaseRichOutputFormat extends RichOutputFormat<RowData>
      * rollback data
      *
      * @param checkpointId
+     *
      * @throws Exception
      */
-    public void rollback(long checkpointId) throws Exception {}
+    public void rollback(long checkpointId) throws Exception {
+    }
 
     public void setRestoreState(FormatState formatState) {
         this.formatState = formatState;
@@ -717,9 +681,5 @@ public abstract class BaseRichOutputFormat extends RichOutputFormat<RowData>
 
     public void setUseAbstractColumn(boolean useAbstractColumn) {
         this.useAbstractColumn = useAbstractColumn;
-    }
-
-    public void setDdlConf(DDLConf ddlConf) {
-        this.ddlConf = ddlConf;
     }
 }

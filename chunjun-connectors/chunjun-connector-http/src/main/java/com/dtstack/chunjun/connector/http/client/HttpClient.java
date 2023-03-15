@@ -89,9 +89,9 @@ public class HttpClient {
     /** last response body */
     private String prevResponse;
 
-    private boolean reachEnd;
+    protected boolean reachEnd;
 
-    private boolean running;
+    protected boolean running;
 
     protected long requestNumber;
 

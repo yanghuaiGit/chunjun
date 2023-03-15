@@ -17,11 +17,6 @@
  */
 package com.dtstack.chunjun;
 
-import com.dtstack.chunjun.cdc.CdcConf;
-import com.dtstack.chunjun.cdc.RestorationFlatMap;
-import com.dtstack.chunjun.cdc.ddl.DdlConvent;
-import com.dtstack.chunjun.cdc.handler.CacheHandler;
-import com.dtstack.chunjun.cdc.handler.DDLHandler;
 import com.dtstack.chunjun.conf.OperatorConf;
 import com.dtstack.chunjun.conf.SpeedConf;
 import com.dtstack.chunjun.conf.SyncConf;
@@ -32,8 +27,6 @@ import com.dtstack.chunjun.enums.ClusterMode;
 import com.dtstack.chunjun.enums.EJobType;
 import com.dtstack.chunjun.environment.EnvFactory;
 import com.dtstack.chunjun.environment.MyLocalStreamEnvironment;
-import com.dtstack.chunjun.mapping.MappingConf;
-import com.dtstack.chunjun.mapping.NameMappingFlatMap;
 import com.dtstack.chunjun.options.OptionParser;
 import com.dtstack.chunjun.options.Options;
 import com.dtstack.chunjun.sink.SinkFactory;
@@ -48,7 +41,6 @@ import com.dtstack.chunjun.util.JobUtil;
 import com.dtstack.chunjun.util.PluginUtil;
 import com.dtstack.chunjun.util.PrintUtil;
 import com.dtstack.chunjun.util.PropertiesUtil;
-import com.dtstack.chunjun.util.RealTimeDataSourceNameUtil;
 import com.dtstack.chunjun.util.TableUtil;
 
 import org.apache.flink.api.common.JobExecutionResult;
@@ -187,20 +179,6 @@ public class Main {
             dataStreamSource =
                     ((DataStreamSource<RowData>) dataStreamSource)
                             .setParallelism(speed.getReaderChannel());
-        }
-
-        dataStreamSource = addMappingOperator(config, dataStreamSource);
-
-        if (null != config.getCdcConf()
-                && (null != config.getCdcConf().getDdl()
-                        && null != config.getCdcConf().getCache())) {
-            CdcConf cdcConf = config.getCdcConf();
-            DDLHandler ddlHandler = DataSyncFactoryUtil.discoverDdlHandler(cdcConf, config);
-
-            CacheHandler cacheHandler = DataSyncFactoryUtil.discoverCacheHandler(cdcConf, config);
-            dataStreamSource =
-                    dataStreamSource.flatMap(
-                            new RestorationFlatMap(ddlHandler, cacheHandler, cdcConf));
         }
 
         DataStream<RowData> dataStream;
@@ -358,60 +336,4 @@ public class Main {
         }
     }
 
-    private static DataStream<RowData> addMappingOperator(
-            SyncConf config, DataStream<RowData> dataStreamSource) {
-
-        String sourceName =
-                RealTimeDataSourceNameUtil.getDataSourceName(
-                        PluginUtil.replaceReaderAndWriterSuffix(config.getReader().getName()));
-        // if source is kafka, need to specify the data source in mappingConf
-        if (config.getNameMappingConf() != null
-                && StringUtils.isNotBlank(config.getNameMappingConf().getSourceName())) {
-            sourceName = config.getNameMappingConf().getSourceName();
-        }
-        // 如果是实时任务 则sourceName 会和脚本里的名称不一致 例如 oraclelogminer 会转为oracle，binlogreader转为mysql
-        if (PluginUtil.replaceReaderAndWriterSuffix(config.getReader().getName())
-                .equals(sourceName)) {
-            return dataStreamSource;
-        }
-        String sinkName = PluginUtil.replaceReaderAndWriterSuffix(config.getWriter().getName());
-
-        // 异构数据源 或者 需要进行元数据替换
-        boolean ddlSkip = config.getReader().getBooleanVal("ddlSkip", true);
-        boolean useDdlConvent =
-                !sourceName.equals(sinkName) && !ddlSkip
-                        || (config.getNameMappingConf() != null
-                                && config.getNameMappingConf().needReplaceMetaData());
-
-        if (useDdlConvent) {
-            DdlConvent sourceDdlConvent = null;
-            DdlConvent sinkDdlConvent = null;
-            MappingConf mappingConf = config.getNameMappingConf();
-
-            try {
-                sourceDdlConvent =
-                        DataSyncFactoryUtil.discoverDdlConventHandler(
-                                mappingConf, sourceName, config);
-            } catch (Throwable e) {
-                // ignore
-            }
-
-            if (sourceDdlConvent == null || sourceName.equals(sinkName)) {
-                sinkDdlConvent = sourceDdlConvent;
-            } else {
-                try {
-                    sinkDdlConvent =
-                            DataSyncFactoryUtil.discoverDdlConventHandler(
-                                    mappingConf, sinkName, config);
-                } catch (Throwable e) {
-                    // ignore
-                }
-            }
-
-            return dataStreamSource.flatMap(
-                    new NameMappingFlatMap(
-                            mappingConf, useDdlConvent, sourceDdlConvent, sinkDdlConvent));
-        }
-        return dataStreamSource;
-    }
 }

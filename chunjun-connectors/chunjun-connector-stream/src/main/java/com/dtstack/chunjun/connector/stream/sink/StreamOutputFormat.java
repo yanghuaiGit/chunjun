@@ -18,7 +18,6 @@
 
 package com.dtstack.chunjun.connector.stream.sink;
 
-import com.dtstack.chunjun.cdc.DdlRowData;
 import com.dtstack.chunjun.conf.FieldConf;
 import com.dtstack.chunjun.connector.stream.conf.StreamConf;
 import com.dtstack.chunjun.connector.stream.util.TablePrintUtil;
@@ -79,9 +78,6 @@ public class StreamOutputFormat extends BaseRichOutputFormat {
             fieldNames = ((ColumnRowData) rowData).getHeaders();
         }
 
-        if (rowData instanceof DdlRowData) {
-            fieldNames = ((DdlRowData) rowData).getHeaders();
-        }
 
         if (fieldNames == null) {
             List<FieldConf> fieldConfList = streamConf.getColumn();

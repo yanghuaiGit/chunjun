@@ -18,12 +18,8 @@
 
 package com.dtstack.chunjun.conf;
 
-import com.dtstack.chunjun.cdc.CdcConf;
-import com.dtstack.chunjun.mapping.MappingConf;
-
 import org.junit.Test;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -85,23 +81,7 @@ public class JobConfTest {
     }
 
     /** Should return the name mapping when the content is not empty */
-    @Test
-    public void getNameMappingWhenContentIsNotEmpty() {
-        LinkedHashMap<String, String> identifierMappings = new LinkedHashMap<>();
-        identifierMappings.put("dujie", "test_${dataBaseName}");
-        identifierMappings.put("dujie.*", "test_${dataBaseName}.${tableName}");
-        LinkedHashMap<String, String> columnTypeMappings = new LinkedHashMap<>();
-        columnTypeMappings.put("int", "varchar(255)");
-        MappingConf nameMappingConf = new MappingConf(identifierMappings, columnTypeMappings);
-        JobConf jobConf = new JobConf();
-        ContentConf contentConf = new ContentConf();
-        contentConf.setNameMapping(nameMappingConf);
-        LinkedList<ContentConf> content = new LinkedList<>();
-        content.add(contentConf);
-        jobConf.setContent(content);
 
-        assertEquals(nameMappingConf, jobConf.getNameMapping());
-    }
 
     /** Should return the setting */
     @Test
@@ -121,21 +101,6 @@ public class JobConfTest {
         assertEquals(content, jobConf.getContent());
     }
 
-    /** Should return the cdc configuration */
-    @Test
-    public void getCdcConfShouldReturnTheCdcConfiguration() {
-        JobConf jobConf = new JobConf();
-        LinkedList<ContentConf> content = new LinkedList<>();
-        ContentConf contentConf = new ContentConf();
-        CdcConf cdcConf = new CdcConf();
-        contentConf.setRestoration(cdcConf);
-        content.add(contentConf);
-        jobConf.setContent(content);
-
-        CdcConf result = jobConf.getCdcConf();
-
-        assertEquals(cdcConf, result);
-    }
 
     /** Should return the transformer of the first content */
     @Test

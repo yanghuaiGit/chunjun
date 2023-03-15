@@ -18,7 +18,6 @@
 
 package com.dtstack.chunjun.connector.stream.util;
 
-import com.dtstack.chunjun.cdc.DdlRowData;
 import com.dtstack.chunjun.element.AbstractBaseColumn;
 import com.dtstack.chunjun.element.ColumnRowData;
 import com.dtstack.chunjun.throwable.UnsupportedTypeException;
@@ -172,14 +171,6 @@ public class TablePrintUtil {
             }
         } else if (row instanceof GenericRowData) {
             genericRowData = (GenericRowData) row;
-        } else if (row instanceof DdlRowData) {
-            DdlRowData columnRowData = (DdlRowData) row;
-            for (int pos = 0; pos < row.getArity(); pos++) {
-                String field = columnRowData.getInfo(pos);
-                if (field != null) {
-                    genericRowData.setField(pos, field);
-                }
-            }
         } else {
             throw new UnsupportedTypeException(row.getClass().getSimpleName());
         }

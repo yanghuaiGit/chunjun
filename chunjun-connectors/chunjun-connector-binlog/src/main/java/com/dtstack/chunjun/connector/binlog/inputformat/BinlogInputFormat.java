@@ -161,10 +161,6 @@ public class BinlogInputFormat extends BaseRichInputFormat {
         binlogEventSink = new BinlogEventSink(this);
         controller = getController(binlogConf.username, binlogConf.getFilter(), binlogEventSink);
 
-        // 任务启动前 先初始化表结构
-        if (binlogConf.isInitialTableStructure()) {
-            binlogEventSink.initialTableStructData(tableFilters);
-        }
         controller.start();
     }
 

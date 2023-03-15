@@ -50,7 +50,7 @@ import java.util.List;
 
 public class HttpSourceFactory extends SourceFactory {
 
-    private final HttpRestConfig httpRestConfig;
+    protected final HttpRestConfig httpRestConfig;
 
     public HttpSourceFactory(SyncConf config, StreamExecutionEnvironment env) {
         super(config, env);

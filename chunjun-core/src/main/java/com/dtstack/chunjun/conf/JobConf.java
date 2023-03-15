@@ -17,9 +17,6 @@
  */
 package com.dtstack.chunjun.conf;
 
-import com.dtstack.chunjun.cdc.CdcConf;
-import com.dtstack.chunjun.mapping.MappingConf;
-
 import java.io.Serializable;
 import java.util.LinkedList;
 
@@ -42,13 +39,6 @@ public class JobConf implements Serializable {
         return content.get(0).getWriter();
     }
 
-    public CdcConf getCdcConf() {
-        return content.get(0).getRestoration();
-    }
-
-    public MappingConf getNameMapping() {
-        return content.get(0).getNameMapping();
-    }
 
     public TransformerConf getTransformer() {
         return content.get(0).getTransformer();

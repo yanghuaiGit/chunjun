@@ -18,8 +18,7 @@
 
 package com.dtstack.chunjun.util;
 
-import com.dtstack.chunjun.cdc.conf.CacheConf;
-import com.dtstack.chunjun.cdc.conf.DDLConf;
+
 import com.dtstack.chunjun.conf.SyncConf;
 import com.dtstack.chunjun.constants.ConstantValue;
 import com.dtstack.chunjun.dirty.DirtyConf;
@@ -345,40 +344,10 @@ public class PluginUtil {
                         config.getRemotePluginPath(),
                         DIRTY_DATA_DIR_NAME);
 
-        if (null != config.getCdcConf()) {
-            Set<URL> restoreUrlSet = new HashSet<>();
 
-            CacheConf cache = config.getCdcConf().getCache();
-            DDLConf ddl = config.getCdcConf().getDdl();
-
-            if (null != cache) {
-                Set<URL> cacheUrlSet =
-                        getJarFileDirPath(
-                                cache.getType(),
-                                config.getPluginRoot(),
-                                config.getRemotePluginPath(),
-                                RESTORE_DIR_NAME);
-                restoreUrlSet.addAll(cacheUrlSet);
-            }
-
-            if (null != ddl) {
-                Set<URL> ddlUrlSet =
-                        getJarFileDirPath(
-                                ddl.getType(),
-                                config.getPluginRoot(),
-                                config.getRemotePluginPath(),
-                                RESTORE_DIR_NAME);
-                restoreUrlSet.addAll(ddlUrlSet);
-            }
-            urlSet.addAll(restoreUrlSet);
-        }
 
         String sourceConventName =
                 RealTimeDataSourceNameUtil.getDataSourceName(config.getReader().getName());
-        if (config.getNameMappingConf() != null
-                && StringUtils.isNotBlank(config.getNameMappingConf().getSourceName())) {
-            sourceConventName = config.getNameMappingConf().getSourceName();
-        }
 
         // 实时任务的sourceConventName和config里配置的名字是不一样的 否则就是离线任务
         if (!sourceConventName.equals(

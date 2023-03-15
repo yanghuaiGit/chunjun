@@ -30,7 +30,7 @@ import java.util.Map;
  * @author by dujie@dtstack.com @Date 2020/9/25
  */
 public class HttpRequestParam {
-
+ public static final HttpRequestParam httpRequestParam = new HttpRequestParam();
     private Map<String, Object> body = new HashMap<>(32);
     private Map<String, Object> header = new HashMap<>(32);
     private Map<String, Object> param = new HashMap<>(32);

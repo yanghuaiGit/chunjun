@@ -17,9 +17,6 @@
  */
 package com.dtstack.chunjun.connector.binlog.converter;
 
-import com.dtstack.chunjun.cdc.DdlRowData;
-import com.dtstack.chunjun.cdc.DdlRowDataBuilder;
-import com.dtstack.chunjun.cdc.EventType;
 import com.dtstack.chunjun.connector.binlog.listener.BinlogEventRow;
 import com.dtstack.chunjun.constants.CDCConstantValue;
 import com.dtstack.chunjun.constants.ConstantValue;
@@ -40,9 +37,6 @@ import org.apache.flink.calcite.shaded.com.google.common.collect.Maps;
 import org.apache.flink.table.data.RowData;
 import org.apache.flink.types.RowKind;
 
-import com.alibaba.otter.canal.parse.inbound.mysql.ddl.DdlResult;
-import com.alibaba.otter.canal.parse.inbound.mysql.ddl.DdlResultExtend;
-import com.alibaba.otter.canal.parse.inbound.mysql.ddl.DruidDdlParser;
 import com.alibaba.otter.canal.protocol.CanalEntry;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -54,8 +48,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import static com.dtstack.chunjun.constants.CDCConstantValue.AFTER;
 import static com.dtstack.chunjun.constants.CDCConstantValue.AFTER_;
@@ -89,135 +81,6 @@ public class BinlogColumnConverter extends AbstractCDCRowConverter<BinlogEventRo
         String schema = binlogEventRow.getSchema();
         String table = binlogEventRow.getTable();
         String key = schema + ConstantValue.POINT_SYMBOL + table;
-
-        if (rowChange.getIsDdl() || rowChange.getEventType().equals(CanalEntry.EventType.QUERY)) {
-            super.cdcConverterCacheMap.remove(key);
-            // 处理 ddl rowChange
-            if (rowChange.getEventType().equals(CanalEntry.EventType.ERASE)) {
-                List<DdlResult> parse =
-                        DruidDdlParser.parse(
-                                binlogEventRow.getRowChange().getSql(),
-                                binlogEventRow.getRowChange().getDdlSchemaName());
-                result.addAll(
-                        parse.stream()
-                                .map(
-                                        i ->
-                                                DdlRowDataBuilder.builder()
-                                                        .setDatabaseName(i.getSchemaName())
-                                                        .setTableName(i.getTableName())
-                                                        .setContent(
-                                                                "DROP TABLE "
-                                                                        + i.getSchemaName()
-                                                                        + "."
-                                                                        + i.getTableName())
-                                                        .setType(
-                                                                binlogEventRow
-                                                                        .getRowChange()
-                                                                        .getEventType()
-                                                                        .name())
-                                                        .setLsn(
-                                                                String.valueOf(
-                                                                        binlogEventRow
-                                                                                .getExecuteTime()))
-                                                        .build())
-                                .collect(Collectors.toList()));
-
-            } else if (rowChange.getEventType().equals(CanalEntry.EventType.RENAME)) {
-                List<DdlResult> parse =
-                        DruidDdlParser.parse(
-                                binlogEventRow.getRowChange().getSql(),
-                                binlogEventRow.getRowChange().getDdlSchemaName());
-                result.addAll(
-                        parse.stream()
-                                .map(
-                                        i ->
-                                                DdlRowDataBuilder.builder()
-                                                        .setDatabaseName(i.getSchemaName())
-                                                        .setTableName(i.getTableName())
-                                                        .setContent(
-                                                                "RENAME TABLE "
-                                                                        + i.getOriSchemaName()
-                                                                        + "."
-                                                                        + i.getOriTableName()
-                                                                        + " TO "
-                                                                        + i.getSchemaName()
-                                                                        + "."
-                                                                        + i.getTableName())
-                                                        .setType(
-                                                                binlogEventRow
-                                                                        .getRowChange()
-                                                                        .getEventType()
-                                                                        .name())
-                                                        .setLsn(
-                                                                String.valueOf(
-                                                                        binlogEventRow
-                                                                                .getExecuteTime()))
-                                                        .build())
-                                .collect(Collectors.toList()));
-            } else if (rowChange.getEventType().equals(CanalEntry.EventType.QUERY)) {
-                List<DdlResult> parse =
-                        DruidDdlParser.parse(
-                                binlogEventRow.getRowChange().getSql(),
-                                binlogEventRow.getRowChange().getDdlSchemaName());
-                AtomicInteger index = new AtomicInteger();
-                result.addAll(
-                        parse.stream()
-                                .map(
-                                        i -> {
-                                            if (i instanceof DdlResultExtend) {
-                                                if (EventType.DROP_SCHEMA.equals(
-                                                        ((DdlResultExtend) i)
-                                                                .getChunjunEventType())) {
-                                                    return DdlRowDataBuilder.builder()
-                                                            .setDatabaseName(null)
-                                                            .setSchemaName(i.getSchemaName())
-                                                            .setTableName(i.getTableName())
-                                                            .setContent(
-                                                                    "drop schema "
-                                                                            + i.getSchemaName())
-                                                            .setType(EventType.DROP_SCHEMA.name())
-                                                            .setLsn(binlogEventRow.getLsn())
-                                                            .setLsnSequence(
-                                                                    index.getAndIncrement() + "")
-                                                            .build();
-                                                } else if (EventType.CREATE_SCHEMA.equals(
-                                                        ((DdlResultExtend) i)
-                                                                .getChunjunEventType())) {
-                                                    return DdlRowDataBuilder.builder()
-                                                            .setDatabaseName(null)
-                                                            .setSchemaName(i.getSchemaName())
-                                                            .setTableName(i.getTableName())
-                                                            .setContent(
-                                                                    "create schema "
-                                                                            + i.getSchemaName())
-                                                            .setType(EventType.CREATE_SCHEMA.name())
-                                                            .setLsn(binlogEventRow.getLsn())
-                                                            .setLsnSequence(
-                                                                    index.getAndIncrement() + "")
-                                                            .build();
-                                                } else if (EventType.ALTER_TABLE_COMMENT.equals(
-                                                        ((DdlResultExtend) i)
-                                                                .getChunjunEventType())) {
-                                                    return swapEventToDdlRowData(binlogEventRow);
-                                                }
-                                                throw new RuntimeException(
-                                                        "not support sql: "
-                                                                + binlogEventRow
-                                                                        .getRowChange()
-                                                                        .getSql());
-                                            } else {
-                                                throw new RuntimeException(
-                                                        "not support sql: "
-                                                                + binlogEventRow
-                                                                        .getRowChange()
-                                                                        .getSql());
-                                            }
-                                        })
-                                .collect(Collectors.toList()));
-            } else {
-                result.add(swapEventToDdlRowData(binlogEventRow));
-            }
-        }
 
         List<IDeserializationConverter> converters = super.cdcConverterCacheMap.get(key);
 
@@ -432,21 +295,4 @@ public class BinlogColumnConverter extends AbstractCDCRowConverter<BinlogEventRo
         return map;
     }
 
-    /**
-     * 将 binlogEventRow {@link BinlogEventRow} 转化为 ddlRowData {@link DdlRowData}
-     *
-     * @param binlogEventRow binlog 事件数据
-     * @return ddl row-data
-     */
-    private DdlRowData swapEventToDdlRowData(BinlogEventRow binlogEventRow) {
-        return DdlRowDataBuilder.builder()
-                .setDatabaseName(null)
-                .setSchemaName(binlogEventRow.getSchema())
-                .setTableName(binlogEventRow.getTable())
-                .setContent(binlogEventRow.getRowChange().getSql())
-                .setType(binlogEventRow.getRowChange().getEventType().name())
-                .setLsn(binlogEventRow.getLsn())
-                .setLsnSequence("0")
-                .build();
-    }
 }

@@ -20,6 +20,7 @@ package com.dtstack.chunjun.local.test;
 import com.dtstack.chunjun.Main;
 import com.dtstack.chunjun.util.GsonUtil;
 
+import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ public class LocalTest {
     public static Logger LOG = LoggerFactory.getLogger(LocalTest.class);
 
     public static void main(String[] args) throws Exception {
-        LOG.warn("-----");
+             LOG.warn("-----");
         Properties confProperties = new Properties();
         //        confProperties.setProperty("flink.checkpoint.interval", "30000");
         //        confProperties.setProperty("state.backend","ROCKSDB");
@@ -47,7 +48,7 @@ public class LocalTest {
         //        confProperties.setProperty("state.checkpoints.dir", "file:///ck");
         String userDir = System.getProperty("user.dir");
 
-        String jobPath = userDir + "/chunjun-examples/json/stream/stream.json";
+        String jobPath = "/Users/yh/Code/opensource/chunjun/chunjun-examples/json/http/http_stream.json";
         String chunjunDistDir = userDir + "/start-chunjun-dist";
         String s = "";
 

@@ -97,7 +97,6 @@ public abstract class JdbcSinkFactory extends SinkFactory {
         JdbcOutputFormatBuilder builder = getBuilder();
         initColumnInfo();
         builder.setJdbcConf(jdbcConf);
-        builder.setDdlConf(ddlConf);
         builder.setJdbcDialect(jdbcDialect);
         builder.setColumnNameList(columnNameList);
         builder.setColumnTypeList(columnTypeList);

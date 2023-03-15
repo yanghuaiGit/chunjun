@@ -18,7 +18,6 @@
 
 package com.dtstack.chunjun.metrics;
 
-import com.dtstack.chunjun.cdc.DdlRowData;
 import com.dtstack.chunjun.element.ColumnRowData;
 import com.dtstack.chunjun.throwable.ChunJunRuntimeException;
 import com.dtstack.chunjun.throwable.UnsupportedTypeException;
@@ -96,8 +95,6 @@ public abstract class RowSizeCalculator<T> {
         public long getObjectSize(RowData rowData) {
             if (rowData instanceof ColumnRowData) {
                 return ((ColumnRowData) rowData).getByteSize();
-            } else if (rowData instanceof DdlRowData) {
-                return ((DdlRowData) rowData).getByteSize();
             }
             throw new RuntimeException(
                     "not support get rowSize for " + rowData.getClass().getName());

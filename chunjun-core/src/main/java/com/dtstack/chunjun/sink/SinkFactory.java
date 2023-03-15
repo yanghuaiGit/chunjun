@@ -18,8 +18,6 @@
 
 package com.dtstack.chunjun.sink;
 
-import com.dtstack.chunjun.cdc.CdcConf;
-import com.dtstack.chunjun.cdc.conf.DDLConf;
 import com.dtstack.chunjun.conf.ChunJunCommonConf;
 import com.dtstack.chunjun.conf.SpeedConf;
 import com.dtstack.chunjun.conf.SyncConf;
@@ -38,7 +36,6 @@ import org.apache.commons.lang3.StringUtils;
 public abstract class SinkFactory implements RawTypeConvertible {
 
     protected SyncConf syncConf;
-    protected DDLConf ddlConf;
     protected boolean useAbstractBaseColumn = true;
 
     public SinkFactory(SyncConf syncConf) {
@@ -48,16 +45,13 @@ public abstract class SinkFactory implements RawTypeConvertible {
                 && StringUtils.isNotBlank(syncConf.getTransformer().getTransformSql())) {
             useAbstractBaseColumn = false;
         }
-        CdcConf cdcConf = syncConf.getCdcConf();
-        if (cdcConf != null) {
-            ddlConf = cdcConf.getDdl();
-        }
     }
 
     /**
      * Build the write data flow with read data flow
      *
      * @param dataSet read data flow
+     *
      * @return write data flow
      */
     public abstract DataStreamSink<RowData> createSink(DataStream<RowData> dataSet);

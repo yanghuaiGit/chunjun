@@ -18,12 +18,6 @@
 
 package com.dtstack.chunjun.util;
 
-import com.dtstack.chunjun.cdc.CdcConf;
-import com.dtstack.chunjun.cdc.conf.CacheConf;
-import com.dtstack.chunjun.cdc.conf.DDLConf;
-import com.dtstack.chunjun.cdc.ddl.DdlConvent;
-import com.dtstack.chunjun.cdc.handler.CacheHandler;
-import com.dtstack.chunjun.cdc.handler.DDLHandler;
 import com.dtstack.chunjun.classloader.ClassLoaderManager;
 import com.dtstack.chunjun.conf.ChunJunCommonConf;
 import com.dtstack.chunjun.conf.MetricParam;
@@ -31,7 +25,6 @@ import com.dtstack.chunjun.conf.SyncConf;
 import com.dtstack.chunjun.dirty.DirtyConf;
 import com.dtstack.chunjun.dirty.consumer.DirtyDataCollector;
 import com.dtstack.chunjun.enums.OperatorType;
-import com.dtstack.chunjun.mapping.MappingConf;
 import com.dtstack.chunjun.metrics.CustomReporter;
 import com.dtstack.chunjun.sink.SinkFactory;
 import com.dtstack.chunjun.source.SourceFactory;
@@ -45,8 +38,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
-import java.net.URL;
-import java.util.Set;
 
 /**
  * @program: chunjun
@@ -134,88 +125,6 @@ public class DataSyncFactoryUtil {
             return consumer;
         } catch (Exception e) {
             throw new NoRestartException("Load dirty plugins failed!", e);
-        }
-    }
-
-    public static DDLHandler discoverDdlHandler(DDLConf ddlConf) {
-        try {
-            String pluginClassName =
-                    PluginUtil.getPluginClassName(ddlConf.getType(), OperatorType.ddl);
-
-            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            Class<?> clazz = classLoader.loadClass(pluginClassName);
-            Constructor<?> constructor = clazz.getConstructor(DDLConf.class);
-            return (DDLHandler) constructor.newInstance(ddlConf);
-        } catch (Exception e) {
-            throw new NoRestartException("Load ddlHandler plugins failed!", e);
-        }
-    }
-
-    public static DDLHandler discoverDdlHandler(CdcConf cdcConf, SyncConf syncConf) {
-        try {
-            DDLConf ddl = cdcConf.getDdl();
-            String ddlPluginClassName =
-                    PluginUtil.getPluginClassName(ddl.getType(), OperatorType.ddl);
-
-            Set<URL> ddlList =
-                    PluginUtil.getJarFileDirPath(
-                            ddl.getType(), syncConf.getPluginRoot(), null, "restore-plugins");
-
-            return ClassLoaderManager.newInstance(
-                    ddlList,
-                    cl -> {
-                        Class<?> clazz = cl.loadClass(ddlPluginClassName);
-                        Constructor<?> constructor = clazz.getConstructor(DDLConf.class);
-                        return (DDLHandler) constructor.newInstance(ddl);
-                    });
-        } catch (Exception e) {
-            throw new NoRestartException("Load restore plugins failed!", e);
-        }
-    }
-
-    public static CacheHandler discoverCacheHandler(CdcConf cdcConf, SyncConf syncConf) {
-        try {
-            CacheConf cache = cdcConf.getCache();
-
-            String cachePluginClassName =
-                    PluginUtil.getPluginClassName(cache.getType(), OperatorType.cache);
-
-            Set<URL> cacheList =
-                    PluginUtil.getJarFileDirPath(
-                            cache.getType(), syncConf.getPluginRoot(), null, "restore-plugins");
-
-            return ClassLoaderManager.newInstance(
-                    cacheList,
-                    cl -> {
-                        Class<?> clazz = cl.loadClass(cachePluginClassName);
-                        Constructor<?> constructor = clazz.getConstructor(CacheConf.class);
-                        return (CacheHandler) constructor.newInstance(cache);
-                    });
-        } catch (Exception e) {
-            throw new NoRestartException("Load restore plugins failed!", e);
-        }
-    }
-
-    public static DdlConvent discoverDdlConventHandler(
-            MappingConf mappingConf, String pluginName, SyncConf syncConf) {
-        try {
-
-            String cachePluginClassName =
-                    PluginUtil.getPluginClassName(pluginName, OperatorType.ddlConvent);
-
-            Set<URL> cacheList =
-                    PluginUtil.getJarFileDirPath(
-                            pluginName, syncConf.getPluginRoot(), null, "ddl-plugins");
-
-            return ClassLoaderManager.newInstance(
-                    cacheList,
-                    cl -> {
-                        Class<?> clazz = cl.loadClass(cachePluginClassName);
-                        Constructor<?> constructor = clazz.getConstructor(MappingConf.class);
-                        return (DdlConvent) constructor.newInstance(mappingConf);
-                    });
-        } catch (Exception e) {
-            throw new NoRestartException("Load ddlConvent failed!", e);
         }
     }
 }

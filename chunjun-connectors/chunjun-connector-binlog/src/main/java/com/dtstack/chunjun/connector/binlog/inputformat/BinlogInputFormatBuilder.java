@@ -17,7 +17,6 @@
  */
 package com.dtstack.chunjun.connector.binlog.inputformat;
 
-import com.dtstack.chunjun.cdc.EventType;
 import com.dtstack.chunjun.connector.binlog.conf.BinlogConf;
 import com.dtstack.chunjun.connector.binlog.util.BinlogUtil;
 import com.dtstack.chunjun.converter.AbstractCDCRowConverter;
@@ -31,7 +30,6 @@ import com.dtstack.chunjun.util.RetryUtil;
 import com.dtstack.chunjun.util.TelnetUtil;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -40,7 +38,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Locale;
 import java.util.Properties;
 
 /**
@@ -115,19 +112,6 @@ public class BinlogInputFormatBuilder extends BaseRichInputFormatBuilder<BinlogI
             sb.append("binLog can not support channel bigger than 1, current channel is [")
                     .append(binlogConf.getParallelism())
                     .append("];\n");
-        }
-
-        // 校验binlog cat
-        if (StringUtils.isNotEmpty(binlogConf.getCat())) {
-            List<String> cats = Lists.newArrayList(binlogConf.getCat().toUpperCase().split(","));
-            cats.removeIf(s -> EventType.contains(s.toUpperCase(Locale.ENGLISH)));
-            if (CollectionUtils.isNotEmpty(cats)) {
-                sb.append("binlog cat not support-> ")
-                        .append(GsonUtil.GSON.toJson(cats))
-                        .append(",just support->")
-                        .append(GsonUtil.GSON.toJson(EventType.values()))
-                        .append(";\n");
-            }
         }
 
         // 校验binlog的start参数
