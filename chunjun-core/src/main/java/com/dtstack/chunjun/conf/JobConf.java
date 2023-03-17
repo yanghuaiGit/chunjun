@@ -39,7 +39,6 @@ public class JobConf implements Serializable {
         return content.get(0).getWriter();
     }
 
-
     public TransformerConf getTransformer() {
         return content.get(0).getTransformer();
     }

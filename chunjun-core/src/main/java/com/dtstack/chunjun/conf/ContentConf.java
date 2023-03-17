@@ -30,6 +30,7 @@ public class ContentConf implements Serializable {
     private OperatorConf reader;
     private OperatorConf writer;
     private TransformerConf transformer;
+
     public OperatorConf getReader() {
         return reader;
     }

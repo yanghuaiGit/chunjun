@@ -294,5 +294,4 @@ public class BinlogColumnConverter extends AbstractCDCRowConverter<BinlogEventRo
         }
         return map;
     }
-
 }

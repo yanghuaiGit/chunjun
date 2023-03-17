@@ -22,7 +22,8 @@ import com.dtstack.chunjun.connector.httpbinance.HttpbinanceInputFormat;
 import com.dtstack.chunjun.connector.httpbinance.client.HttpBinanceConfig;
 import com.dtstack.chunjun.source.format.BaseRichInputFormatBuilder;
 
-public class HttpbinanceInputFormatBuilder extends BaseRichInputFormatBuilder<HttpbinanceInputFormat> {
+public class HttpbinanceInputFormatBuilder
+        extends BaseRichInputFormatBuilder<HttpbinanceInputFormat> {
     public HttpbinanceInputFormatBuilder() {
         super(new HttpbinanceInputFormat());
     }
@@ -32,7 +33,5 @@ public class HttpbinanceInputFormatBuilder extends BaseRichInputFormatBuilder<Ht
     }
 
     @Override
-    protected void checkFormat() {
-
-    }
+    protected void checkFormat() {}
 }

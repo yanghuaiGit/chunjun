@@ -4,8 +4,8 @@
       {
         "reader": {
           "parameter": {
-            "startTime": "1484907658000",
-            "endTime": "1678839163100",
+            "startTime": "%s",
+            "endTime": "%s",
             "symbol": "BTCUSDT",
             "interval": "1s",
             "column": [
@@ -45,8 +45,11 @@
           "name": "httpbinancereader"
         },
         "writer": {
+          "name": "hdfswriter",
           "parameter": {
-            "print": true,
+            "path": "hdfs://y01:9000/user/hive/warehouse/trade.db/btcusdt",
+            "fileName": "pt=%s",
+            "defaultFS": "hdfs://y01:9000",
             "column": [
               {
                 "name": "symbol",
@@ -58,11 +61,11 @@
               },
               {
                 "name": "open",
-                "type": "string"
+                "type": "BIGINT"
               },
               {
                 "name": "close",
-                "type": "string"
+                "type": "BIGINT"
               },
               {
                 "name": "o",
@@ -79,9 +82,14 @@
                 "name": "c",
                 "type": "string"
               }
-            ]
-          },
-          "name": "streamwriter"
+            ],
+            "fileType": "orc",
+            "maxFileSize": 10485760,
+            "nextCheckRows": 20000,
+            "fieldDelimiter": ",",
+            "encoding": "utf-8",
+            "writeMode": "overwrite"
+          }
         }
       }
     ],

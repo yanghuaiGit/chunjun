@@ -335,5 +335,4 @@ public class Main {
             throw new JobConfigException(operatorConf.getName(), "table.tableName", "is missing");
         }
     }
-
 }

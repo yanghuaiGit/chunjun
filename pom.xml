@@ -34,7 +34,7 @@
 		<module>chunjun-connectors</module>
 		<module>chunjun-clients</module>
 		<module>chunjun-assembly</module>
-        <!--		<module>chunjun-local-test</module>-->
+<!--        <module>chunjun-local-test</module>-->
 	</modules>
 
 	<properties>
@@ -240,6 +240,16 @@
 			<artifactId>hadoop-mapreduce-client-core</artifactId>
 			<version>${hadoop.version}</version>
 			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>okio</artifactId>
+					<groupId>com.squareup.okio</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>okhttp</artifactId>
+					<groupId>com.squareup.okhttp</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>

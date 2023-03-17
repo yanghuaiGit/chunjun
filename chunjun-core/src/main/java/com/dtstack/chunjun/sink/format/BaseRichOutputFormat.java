@@ -169,8 +169,7 @@ public abstract class BaseRichOutputFormat extends RichOutputFormat<RowData>
 
     protected ExecutorService executorService;
 
-    @VisibleForTesting
-    protected boolean useAbstractColumn;
+    @VisibleForTesting protected boolean useAbstractColumn;
 
     private transient volatile Exception timerWriteException;
 
@@ -194,7 +193,6 @@ public abstract class BaseRichOutputFormat extends RichOutputFormat<RowData>
      *
      * @param taskNumber 任务索引id
      * @param numTasks 子任务数量
-     *
      * @throws IOException
      */
     @Override
@@ -342,8 +340,7 @@ public abstract class BaseRichOutputFormat extends RichOutputFormat<RowData>
     }
 
     @Override
-    public void tryCleanupOnError() throws Exception {
-    }
+    public void tryCleanupOnError() throws Exception {}
 
     /** 初始化累加器指标 */
     protected void initStatisticsAccumulator() {
@@ -494,7 +491,6 @@ public abstract class BaseRichOutputFormat extends RichOutputFormat<RowData>
      *
      * @param pos 异常字段索引
      * @param rowData 当前读取的数据
-     *
      * @return 脏数据异常信息记录
      */
     protected String recordConvertDetailErrorMessage(int pos, Object rowData) {
@@ -543,21 +539,17 @@ public abstract class BaseRichOutputFormat extends RichOutputFormat<RowData>
         return formatState;
     }
 
-
-
     /**
      * pre commit data
      *
      * @throws Exception
      */
-    protected void preCommit() throws Exception {
-    }
+    protected void preCommit() throws Exception {}
 
     /**
      * 写出单条数据
      *
      * @param rowData 数据
-     *
      * @throws WriteRecordException
      */
     protected abstract void writeSingleRecordInternal(RowData rowData) throws WriteRecordException;
@@ -574,7 +566,6 @@ public abstract class BaseRichOutputFormat extends RichOutputFormat<RowData>
      *
      * @param taskNumber 通道索引
      * @param numTasks 通道数量
-     *
      * @throws IOException
      */
     protected abstract void openInternal(int taskNumber, int numTasks) throws IOException;
@@ -608,11 +599,9 @@ public abstract class BaseRichOutputFormat extends RichOutputFormat<RowData>
      * commit data
      *
      * @param checkpointId
-     *
      * @throws Exception
      */
-    public void commit(long checkpointId) throws Exception {
-    }
+    public void commit(long checkpointId) throws Exception {}
 
     /**
      * checkpoint失败时操作
@@ -637,11 +626,9 @@ public abstract class BaseRichOutputFormat extends RichOutputFormat<RowData>
      * rollback data
      *
      * @param checkpointId
-     *
      * @throws Exception
      */
-    public void rollback(long checkpointId) throws Exception {
-    }
+    public void rollback(long checkpointId) throws Exception {}
 
     public void setRestoreState(FormatState formatState) {
         this.formatState = formatState;

@@ -78,7 +78,6 @@ public class StreamOutputFormat extends BaseRichOutputFormat {
             fieldNames = ((ColumnRowData) rowData).getHeaders();
         }
 
-
         if (fieldNames == null) {
             List<FieldConf> fieldConfList = streamConf.getColumn();
             if (CollectionUtils.isNotEmpty(fieldConfList)) {

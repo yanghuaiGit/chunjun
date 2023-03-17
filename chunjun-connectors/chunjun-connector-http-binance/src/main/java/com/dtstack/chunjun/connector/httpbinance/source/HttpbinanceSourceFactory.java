@@ -19,17 +19,12 @@
 package com.dtstack.chunjun.connector.httpbinance.source;
 
 import com.dtstack.chunjun.conf.SyncConf;
-import com.dtstack.chunjun.connector.http.common.HttpRestConfig;
 import com.dtstack.chunjun.connector.http.converter.HttpColumnConverter;
 import com.dtstack.chunjun.connector.http.converter.HttpRowConverter;
-import com.dtstack.chunjun.connector.http.inputformat.HttpInputFormatBuilder;
 import com.dtstack.chunjun.connector.http.source.HttpSourceFactory;
 import com.dtstack.chunjun.connector.httpbinance.client.HttpBinanceConfig;
 import com.dtstack.chunjun.converter.AbstractRowConverter;
-import com.dtstack.chunjun.source.SourceFactory;
-
 import com.dtstack.chunjun.util.JsonUtil;
-
 import com.dtstack.chunjun.util.TableUtil;
 
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -39,11 +34,13 @@ import org.apache.flink.table.types.logical.RowType;
 
 public class HttpbinanceSourceFactory extends HttpSourceFactory {
     HttpBinanceConfig httpBinanceConfig;
+
     public HttpbinanceSourceFactory(SyncConf config, StreamExecutionEnvironment env) {
         super(config, env);
         httpBinanceConfig =
                 JsonUtil.toObject(
-                        JsonUtil.toJson(config.getReader().getParameter()), HttpBinanceConfig.class);
+                        JsonUtil.toJson(config.getReader().getParameter()),
+                        HttpBinanceConfig.class);
     }
 
     @Override
@@ -62,5 +59,4 @@ public class HttpbinanceSourceFactory extends HttpSourceFactory {
         builder.setConfig(httpBinanceConfig);
         return createInput(builder.finish());
     }
-
 }

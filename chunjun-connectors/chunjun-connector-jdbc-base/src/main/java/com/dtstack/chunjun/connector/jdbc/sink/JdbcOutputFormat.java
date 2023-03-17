@@ -299,7 +299,6 @@ public class JdbcOutputFormat extends BaseRichOutputFormat {
         throw new WriteRecordException(e.getMessage(), e);
     }
 
-
     @Override
     public void closeInternal() {
         snapshotWriteCounter.add(rowsOfCurrentTransaction);

@@ -51,7 +51,6 @@ public abstract class SinkFactory implements RawTypeConvertible {
      * Build the write data flow with read data flow
      *
      * @param dataSet read data flow
-     *
      * @return write data flow
      */
     public abstract DataStreamSink<RowData> createSink(DataStream<RowData> dataSet);

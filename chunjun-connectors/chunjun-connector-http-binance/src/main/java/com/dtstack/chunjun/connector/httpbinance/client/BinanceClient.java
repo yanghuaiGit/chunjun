@@ -21,8 +21,6 @@ package com.dtstack.chunjun.connector.httpbinance.client;
 import com.dtstack.chunjun.connector.http.client.HttpClient;
 import com.dtstack.chunjun.connector.http.client.HttpRequestParam;
 import com.dtstack.chunjun.connector.http.client.ResponseValue;
-import com.dtstack.chunjun.connector.http.common.HttpRestConfig;
-import com.dtstack.chunjun.connector.http.common.MetaParam;
 import com.dtstack.chunjun.converter.AbstractRowConverter;
 import com.dtstack.chunjun.element.ColumnRowData;
 import com.dtstack.chunjun.element.column.StringColumn;
@@ -45,12 +43,16 @@ public class BinanceClient extends HttpClient {
     SpotClientImpl client;
 
     public BinanceClient(HttpBinanceConfig httpRestConfig, AbstractRowConverter converter) {
-        super(httpRestConfig, Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), converter);
+        super(
+                httpRestConfig,
+                Collections.emptyList(),
+                Collections.emptyList(),
+                Collections.emptyList(),
+                converter);
         this.startTime = httpRestConfig.getStartTime();
         client = new SpotClientImpl(httpRestConfig.getApiKey(), httpRestConfig.getSecretKey());
         this.httpRestConfig = httpRestConfig;
     }
-
 
     public void execute() {
         if (reachEnd) {
@@ -65,38 +67,36 @@ public class BinanceClient extends HttpClient {
         }
     }
 
-
     public void doExecute(int retryTime) {
         if (retryTime == 0) {
             throw new RuntimeException("重试次数到了 任务结束");
         }
         LinkedHashMap<String, Object> parameters = new LinkedHashMap<>();
 
-
-        //每次循环 将最后一条数据的close时间作为下一次请求的start时间即可 直到数据返回为空即[]
+        // 每次循环 将最后一条数据的close时间作为下一次请求的start时间即可 直到数据返回为空即[]
         parameters.put("symbol", httpRestConfig.getSymbol());
         parameters.put("interval", httpRestConfig.getInterval());
         parameters.put("startTime", startTime);
         parameters.put("endTime", httpRestConfig.getEndTime());
-        //Default 500; max 1000.
+        // Default 500; max 1000.
         parameters.put("limit", "1000");
 
-//        [
-//  [
-//        1499040000000,      // Kline open time
-//                "0.01634790",       // Open price
-//                "0.80000000",       // High price
-//                "0.01575800",       // Low price
-//                "0.01577100",       // Close price
-//                "148976.11427815",  // Volume
-//                1499644799999,      // Kline Close time
-//                "2434.19055334",    // Quote asset volume
-//                308,                // Number of trades
-//                "1756.87402397",    // Taker buy base asset volume
-//                "28.46694368",      // Taker buy quote asset volume
-//                "0"                 // Unused field, ignore.
-//  ]
-//]
+        //        [
+        //  [
+        //        1499040000000,      // Kline open time
+        //                "0.01634790",       // Open price
+        //                "0.80000000",       // High price
+        //                "0.01575800",       // Low price
+        //                "0.01577100",       // Close price
+        //                "148976.11427815",  // Volume
+        //                1499644799999,      // Kline Close time
+        //                "2434.19055334",    // Quote asset volume
+        //                308,                // Number of trades
+        //                "1756.87402397",    // Taker buy base asset volume
+        //                "28.46694368",      // Taker buy quote asset volume
+        //                "0"                 // Unused field, ignore.
+        //  ]
+        // ]
 
         List list;
         try {
@@ -104,10 +104,10 @@ public class BinanceClient extends HttpClient {
             list = GsonUtil.GSON.fromJson(result, List.class);
         } catch (Throwable e) {
             LOG.warn("请求错误 重试 retryTime{}", retryTime, e);
-            doExecute(retryTime--);
+            doExecute(--retryTime);
             return;
         }
-        //每条数据进行处理
+        // 每条数据进行处理
 
         String lastEndTime = startTime;
         if (CollectionUtils.isNotEmpty(list)) {
@@ -132,10 +132,14 @@ public class BinanceClient extends HttpClient {
                             columnRowData.addField(new StringColumn(data.get(4).toString()));
                         } else if (restConfig.getColumn().get(i).getName().equals("interval")) {
                             columnRowData.addField(new StringColumn(httpRestConfig.getInterval()));
+                        } else if (restConfig.getColumn().get(i).getName().equals("volume")) {
+                            columnRowData.addField(new StringColumn(data.get(5).toString()));
                         }
                     }
                     lastEndTime = data.get(6).toString();
-                    processData(new ResponseValue(columnRowData, HttpRequestParam.httpRequestParam, null));
+                    processData(
+                            new ResponseValue(
+                                    columnRowData, HttpRequestParam.httpRequestParam, null));
                 } else {
                     throw new RuntimeException("返回值不是数组格式");
                 }

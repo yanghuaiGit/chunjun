@@ -18,7 +18,6 @@
 
 package com.dtstack.chunjun.util;
 
-
 import com.dtstack.chunjun.conf.SyncConf;
 import com.dtstack.chunjun.constants.ConstantValue;
 import com.dtstack.chunjun.dirty.DirtyConf;
@@ -60,7 +59,6 @@ import static com.dtstack.chunjun.constants.ConstantValue.CONNECTOR_DIR_NAME;
 import static com.dtstack.chunjun.constants.ConstantValue.DDL_CONVENT_DIR_NAME;
 import static com.dtstack.chunjun.constants.ConstantValue.DIRTY_DATA_DIR_NAME;
 import static com.dtstack.chunjun.constants.ConstantValue.POINT_SYMBOL;
-import static com.dtstack.chunjun.constants.ConstantValue.RESTORE_DIR_NAME;
 
 public class PluginUtil {
     public static final String FORMATS_SUFFIX = "formats";
@@ -343,8 +341,6 @@ public class PluginUtil {
                         config.getPluginRoot(),
                         config.getRemotePluginPath(),
                         DIRTY_DATA_DIR_NAME);
-
-
 
         String sourceConventName =
                 RealTimeDataSourceNameUtil.getDataSourceName(config.getReader().getName());

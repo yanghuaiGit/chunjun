@@ -82,7 +82,6 @@ public class JobConfTest {
 
     /** Should return the name mapping when the content is not empty */
 
-
     /** Should return the setting */
     @Test
     public void getSettingShouldReturnTheSetting() {
@@ -100,7 +99,6 @@ public class JobConfTest {
         jobConf.setContent(content);
         assertEquals(content, jobConf.getContent());
     }
-
 
     /** Should return the transformer of the first content */
     @Test

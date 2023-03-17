@@ -89,10 +89,10 @@
 					<artifactId>snappy-java</artifactId>
 					<groupId>org.xerial.snappy</groupId>
 				</exclusion>
-				<exclusion>
-					<artifactId>hadoop-hdfs-client</artifactId>
-					<groupId>org.apache.hadoop</groupId>
-				</exclusion>
+<!--				<exclusion>-->
+<!--					<artifactId>hadoop-hdfs-client</artifactId>-->
+<!--					<groupId>org.apache.hadoop</groupId>-->
+<!--				</exclusion>-->
 				<exclusion>
 					<artifactId>okhttp</artifactId>
 					<groupId>com.squareup.okhttp</groupId>
@@ -156,11 +156,11 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.dtstack.chunjun</groupId>
-			<artifactId>chunjun-connector-iceberg</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>com.dtstack.chunjun</groupId>-->
+<!--			<artifactId>chunjun-connector-iceberg</artifactId>-->
+<!--			<version>${project.version}</version>-->
+<!--		</dependency>-->
 
 		<!--MQ-->
 		<dependency>
@@ -202,17 +202,11 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!--		<dependency>-->
-		<!--			<groupId>com.dtstack.chunjun</groupId>-->
-		<!--			<artifactId>chunjun-connector-hdfs</artifactId>-->
-		<!--			<version>${project.version}</version>-->
-		<!--		</dependency>-->
 		<dependency>
 			<groupId>com.dtstack.chunjun</groupId>
-			<artifactId>chunjun-connector-hive</artifactId>
+			<artifactId>chunjun-connector-hdfs</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 
 		<!--NoSql-->
 		<dependency>
@@ -220,16 +214,7 @@
 			<artifactId>chunjun-connector-hbase-1.4</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!--		<dependency>-->
-		<!--			<groupId>com.dtstack.chunjun</groupId>-->
-		<!--			<artifactId>chunjun-connector-elasticsearch5</artifactId>-->
-		<!--			<version>${project.version}</version>-->
-		<!--		</dependency>-->
-		<!--		<dependency>-->
-		<!--			<groupId>com.dtstack.chunjun</groupId>-->
-		<!--			<artifactId>chunjun-connector-elasticsearch6</artifactId>-->
-		<!--			<version>${project.version}</version>-->
-		<!--		</dependency>-->
+
 		<dependency>
 			<groupId>com.dtstack.chunjun</groupId>
 			<artifactId>chunjun-connector-redis</artifactId>
