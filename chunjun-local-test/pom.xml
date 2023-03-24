@@ -156,6 +156,12 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.dtstack.chunjun</groupId>
+			<artifactId>chunjun-connector-file</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 <!--		<dependency>-->
 <!--			<groupId>com.dtstack.chunjun</groupId>-->
 <!--			<artifactId>chunjun-connector-iceberg</artifactId>-->

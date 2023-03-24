@@ -16,6 +16,9 @@
               {
                 "name": "interval",
                 "type": "string"
+              }, {
+                "name": "volume",
+                "type": "string"
               },
               {
                 "name": "open",
@@ -45,11 +48,9 @@
           "name": "httpbinancereader"
         },
         "writer": {
-          "name": "hdfswriter",
+          "name": "filewriter",
           "parameter": {
-            "path": "hdfs://y01:9000/user/hive/warehouse/trade.db/btcusdt",
-            "fileName": "pt=%s",
-            "defaultFS": "hdfs://y01:9000",
+            "path": "/Users/yh/data/trade/kline/btcusdt/pt=%s",
             "column": [
               {
                 "name": "symbol",
@@ -83,9 +84,8 @@
                 "type": "string"
               }
             ],
-            "fileType": "orc",
             "maxFileSize": 10485760,
-            "nextCheckRows": 20000,
+            "nextCheckRows": 200000,
             "fieldDelimiter": ",",
             "encoding": "utf-8",
             "writeMode": "overwrite"

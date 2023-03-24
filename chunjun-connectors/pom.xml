@@ -50,7 +50,6 @@
 
 		<!--File-->
 		<module>chunjun-connector-file</module>
-		<module>chunjun-connector-filesystem</module>
 
 		<module>chunjun-connector-hdfs</module>
 		<module>chunjun-connector-hive</module>

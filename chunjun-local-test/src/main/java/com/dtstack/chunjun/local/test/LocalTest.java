@@ -44,10 +44,10 @@ public class LocalTest {
     public static void main(String[] args) throws Exception {
         //2017-08-18是最早的数据
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        int i = 24 * 60 * 60 * 1000;
-        long a = 1672502400L;
+        final int i = 24 * 60 * 60 * 1000;
+        long a = 1673798400000L;
         long b = a + i - 1000;
-        for (int i2 = 0; i2 < 365; i++) {
+        for (int i2 = 0; i2 < 365; i2++) {
             String pt = simpleDateFormat.format(new Date(a));
             if(pt.equals("2023-03-18")){
                 break;
@@ -189,7 +189,7 @@ public class LocalTest {
                 /* ---------------------------------------- pyFlink 测试 end --------------------------------------- */
             }
             Main.main(argsList.toArray(new String[0]));
-            a = 1579449600000L + i;
+            a = a + i;
             b = a + i - 1000;
         }
     }

@@ -1,0 +1,185 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.dtstack.chunjun.connector.file.converter;
+
+import com.dtstack.chunjun.connector.file.config.FileConfig;
+import com.dtstack.chunjun.converter.AbstractRowConverter;
+
+import com.dtstack.chunjun.converter.IDeserializationConverter;
+import com.dtstack.chunjun.converter.ISerializationConverter;
+import com.dtstack.chunjun.element.AbstractBaseColumn;
+import com.dtstack.chunjun.element.ColumnRowData;
+
+import com.dtstack.chunjun.element.column.BigDecimalColumn;
+import com.dtstack.chunjun.element.column.BooleanColumn;
+
+import com.dtstack.chunjun.element.column.NullColumn;
+import com.dtstack.chunjun.element.column.SqlDateColumn;
+import com.dtstack.chunjun.element.column.StringColumn;
+
+import com.dtstack.chunjun.element.column.TimeColumn;
+
+import com.dtstack.chunjun.element.column.TimestampColumn;
+import com.dtstack.chunjun.throwable.UnsupportedTypeException;
+import com.dtstack.chunjun.util.DateUtil;
+
+import org.apache.flink.table.data.GenericRowData;
+import org.apache.flink.table.data.RowData;
+import org.apache.flink.table.types.logical.LogicalType;
+import org.apache.flink.table.types.logical.RowType;
+import org.apache.flink.table.types.logical.TimestampType;
+
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @program: flinkx
+ * @author: xiuzhu
+ * @create: 2021/06/19
+ */
+public class FtpColumnConverter
+        extends AbstractRowConverter<RowData, RowData, String, LogicalType> {
+
+    private FileConfig fileConfig;
+
+    public FtpColumnConverter(RowType rowType, FileConfig fileConfig) {
+        super(rowType, fileConfig);
+        this.fileConfig = fileConfig;
+        for (int i = 0; i < rowType.getFieldCount(); i++) {
+            toInternalConverters.add(
+                    wrapIntoNullableInternalConverter(
+                            createInternalConverter(rowType.getTypeAt(i))));
+            toExternalConverters.add(
+                    wrapIntoNullableExternalConverter(
+                            createExternalConverter(rowType.getTypeAt(i)), rowType.getTypeAt(i)));
+        }
+    }
+
+    @Override
+    public RowData toInternal(RowData input) throws Exception {
+        ColumnRowData row = new ColumnRowData(input.getArity());
+        if (input instanceof GenericRowData) {
+            GenericRowData genericRowData = (GenericRowData) input;
+            for (int i = 0; i < input.getArity(); i++) {
+                row.addField(
+                        (AbstractBaseColumn)
+                                toInternalConverters
+                                        .get(i)
+                                        .deserialize(genericRowData.getField(i)));
+            }
+        } else {
+            throw new RuntimeException(
+                    "Error RowData type, RowData:["
+                            + input
+                            + "] should be instance of GenericRowData.");
+        }
+        return row;
+    }
+
+    @Override
+    public String toExternal(RowData rowData, String output) throws Exception {
+        List<String> columnData = new ArrayList<>(fileConfig.getColumn().size());
+        for (int index = 0; index < toExternalConverters.size(); index++) {
+            toExternalConverters.get(index).serialize(rowData, index, columnData);
+        }
+        return String.join(",", columnData);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    protected ISerializationConverter<List<String>> wrapIntoNullableExternalConverter(
+            ISerializationConverter serializationConverter, LogicalType logicalType) {
+        return (val, index, statement) -> {
+            if (((ColumnRowData) val).getField(index) == null
+                    || ((ColumnRowData) val).getField(index) instanceof NullColumn) {
+                statement.add("");
+            } else {
+                serializationConverter.serialize(val, index, statement);
+            }
+        };
+    }
+
+    @Override
+    protected IDeserializationConverter createInternalConverter(LogicalType type) {
+        switch (type.getTypeRoot()) {
+            case BOOLEAN:
+                return (IDeserializationConverter<String, AbstractBaseColumn>)
+                        val -> new BooleanColumn(Boolean.parseBoolean(val));
+            case TINYINT:
+            case SMALLINT:
+            case INTEGER:
+            case BIGINT:
+            case FLOAT:
+            case DOUBLE:
+            case DECIMAL:
+                return (IDeserializationConverter<String, AbstractBaseColumn>)
+                        BigDecimalColumn::new;
+            case VARCHAR:
+            case CHAR:
+                return (IDeserializationConverter<String, AbstractBaseColumn>) StringColumn::new;
+            case TIME_WITHOUT_TIME_ZONE:
+                return (IDeserializationConverter<String, AbstractBaseColumn>)
+                        val -> new TimeColumn(Time.valueOf(val));
+            case DATE:
+                return (IDeserializationConverter<String, AbstractBaseColumn>)
+                        val -> new SqlDateColumn(Date.valueOf(val));
+            case TIMESTAMP_WITHOUT_TIME_ZONE:
+                return (IDeserializationConverter<Object, AbstractBaseColumn>)
+                        val -> {
+                            int precision = ((TimestampType) (type)).getPrecision();
+                            Timestamp timestamp = DateUtil.convertToTimestamp(val.toString());
+                            if (timestamp != null) {
+                                return new TimestampColumn(timestamp, precision);
+                            }
+                            return new TimestampColumn(
+                                    DateUtil.getTimestampFromStr(val.toString()), precision);
+                        };
+            default:
+                throw new UnsupportedTypeException("Unsupported type:" + type);
+        }
+    }
+
+    @Override
+    protected ISerializationConverter<List<String>> createExternalConverter(
+            LogicalType logicalType) {
+        switch (logicalType.getTypeRoot()) {
+            case DATE:
+                return (rowData, index, list) -> {
+                    if (rowData instanceof ColumnRowData) {
+                        list.add(
+                                index,
+                                ((ColumnRowData) rowData).getField(index).asSqlDate().toString());
+                    } else {
+                        list.add(index, ((GenericRowData) rowData).getField(index).toString());
+                    }
+                };
+            default:
+                return (rowData, index, list) -> {
+                    if (rowData instanceof ColumnRowData) {
+                        list.add(index, ((ColumnRowData) rowData).getField(index).asString());
+                    } else {
+                        list.add(index, ((GenericRowData) rowData).getField(index).toString());
+                    }
+                };
+        }
+    }
+}
