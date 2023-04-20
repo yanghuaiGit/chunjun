@@ -18,11 +18,8 @@
 
 package com.dtstack.chunjun.connector.file.sink;
 
-
 import com.dtstack.chunjun.connector.file.config.FileConfig;
 import com.dtstack.chunjun.sink.format.FileOutputFormatBuilder;
-
-import org.apache.commons.lang.StringUtils;
 
 /**
  * The builder of FtpOutputFormat
@@ -33,7 +30,6 @@ import org.apache.commons.lang.StringUtils;
  */
 public class FtpOutputFormatBuilder extends FileOutputFormatBuilder {
 
-
     public FtpOutputFormatBuilder(FileOutputFormat format) {
         super(format);
     }
@@ -43,6 +39,5 @@ public class FtpOutputFormatBuilder extends FileOutputFormatBuilder {
     }
 
     @Override
-    protected void checkFormat() {
-    }
+    protected void checkFormat() {}
 }

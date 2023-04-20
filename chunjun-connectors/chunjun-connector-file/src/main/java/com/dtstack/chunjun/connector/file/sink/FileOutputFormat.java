@@ -56,23 +56,22 @@ public class FileOutputFormat extends BaseFileOutputFormat {
             file.deleteOnExit();
         } else {
             File[] files = file.listFiles();
-           if(files!= null){
-               for (File listFile :files ) {
-                   listFile.deleteOnExit();
-               }
-           }
-
+            if (files != null) {
+                for (File listFile : files) {
+                    listFile.deleteOnExit();
+                }
+            }
         }
         File file1 = new File(tmpPath);
         if (file1.isFile()) {
             file1.deleteOnExit();
         } else {
             File[] files = file1.listFiles();
-           if(files != null){
-               for (File listFile :files) {
-                   listFile.deleteOnExit();
-               }
-           }
+            if (files != null) {
+                for (File listFile : files) {
+                    listFile.deleteOnExit();
+                }
+            }
         }
     }
 
@@ -83,8 +82,8 @@ public class FileOutputFormat extends BaseFileOutputFormat {
             file.deleteOnExit();
         } else {
             File[] files = file.listFiles();
-            if(files != null){
-                for (File listFile :files) {
+            if (files != null) {
+                for (File listFile : files) {
                     listFile.deleteOnExit();
                 }
             }
@@ -92,9 +91,7 @@ public class FileOutputFormat extends BaseFileOutputFormat {
     }
 
     @Override
-    protected void openSource() {
-
-    }
+    protected void openSource() {}
 
     @Override
     protected String getExtension() {
@@ -111,7 +108,6 @@ public class FileOutputFormat extends BaseFileOutputFormat {
         if (bw == null) {
             nextBlock();
 
-
             String currentBlockTmpPath = tmpPath + File.separator + currentFileName;
             FileWriter fileWriter = null;
             try {
@@ -123,7 +119,6 @@ public class FileOutputFormat extends BaseFileOutputFormat {
             currentFileIndex++;
             LOG.info("nextBlock:Current block writer record:" + rowsOfCurrentBlock);
             LOG.info("Current block file name:" + currentBlockTmpPath);
-
         }
         String data = "";
         try {
@@ -137,7 +132,6 @@ public class FileOutputFormat extends BaseFileOutputFormat {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     @Override
@@ -159,14 +153,20 @@ public class FileOutputFormat extends BaseFileOutputFormat {
         String currentFilePath = "";
         List<String> copyList = new ArrayList<>();
         try {
-            for (File file : Objects.requireNonNull(new File(tmpPath).listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File pathname) {
-                    return pathname.getName().startsWith(filePrefix);
-                }
-            }))) {
+            for (File file :
+                    Objects.requireNonNull(
+                            new File(tmpPath)
+                                    .listFiles(
+                                            new FileFilter() {
+                                                @Override
+                                                public boolean accept(File pathname) {
+                                                    return pathname.getName()
+                                                            .startsWith(filePrefix);
+                                                }
+                                            }))) {
                 currentFilePath = file.getName();
-                FileUtils.copyFile(file, new File(outputFilePath + File.separator + file.getName()));
+                FileUtils.copyFile(
+                        file, new File(outputFilePath + File.separator + file.getName()));
                 copyList.add(outputFilePath + File.separator + file.getName());
             }
 
@@ -188,7 +188,6 @@ public class FileOutputFormat extends BaseFileOutputFormat {
             new File(currentFilePath).deleteOnExit();
             LOG.info("delete file:{}", currentFilePath);
         }
-
     }
 
     @Override

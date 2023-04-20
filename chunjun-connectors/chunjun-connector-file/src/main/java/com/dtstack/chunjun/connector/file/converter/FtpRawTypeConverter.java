@@ -25,7 +25,6 @@ import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.types.DataType;
 import org.apache.flink.table.types.logical.BinaryType;
 
-
 import java.util.Locale;
 
 /**

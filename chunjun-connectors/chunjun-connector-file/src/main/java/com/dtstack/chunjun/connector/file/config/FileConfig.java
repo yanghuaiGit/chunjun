@@ -20,5 +20,4 @@ package com.dtstack.chunjun.connector.file.config;
 
 import com.dtstack.chunjun.conf.BaseFileConf;
 
-public class FileConfig extends BaseFileConf {
-}
+public class FileConfig extends BaseFileConf {}

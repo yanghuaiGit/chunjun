@@ -20,21 +20,16 @@ package com.dtstack.chunjun.connector.file.converter;
 
 import com.dtstack.chunjun.connector.file.config.FileConfig;
 import com.dtstack.chunjun.converter.AbstractRowConverter;
-
 import com.dtstack.chunjun.converter.IDeserializationConverter;
 import com.dtstack.chunjun.converter.ISerializationConverter;
 import com.dtstack.chunjun.element.AbstractBaseColumn;
 import com.dtstack.chunjun.element.ColumnRowData;
-
 import com.dtstack.chunjun.element.column.BigDecimalColumn;
 import com.dtstack.chunjun.element.column.BooleanColumn;
-
 import com.dtstack.chunjun.element.column.NullColumn;
 import com.dtstack.chunjun.element.column.SqlDateColumn;
 import com.dtstack.chunjun.element.column.StringColumn;
-
 import com.dtstack.chunjun.element.column.TimeColumn;
-
 import com.dtstack.chunjun.element.column.TimestampColumn;
 import com.dtstack.chunjun.throwable.UnsupportedTypeException;
 import com.dtstack.chunjun.util.DateUtil;
