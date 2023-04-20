@@ -25,8 +25,8 @@ public class HttpBinanceConfig extends HttpRestConfig {
     private String endTime;
     private String symbol;
     private String interval;
-    private String apiKey = "W0D69F6qNIfDUjF7utegucFZLODE9tIplxsldZMmiRs0Ya7LpNpn5HgAYZJdDIvo";
-    private String secretKey = "8AnyCPOCVZGKAwVEXhKkurA9GvUI1R7jNG5az6iShgXhkGoGP2qxTSB3rtB24a6s";
+    private String apiKey;
+    private String secretKey;
 
     public String getStartTime() {
         return startTime;
