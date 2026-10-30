@@ -1,0 +1,43 @@
+chunjun-connectors/chunjun-connector-jdbc-base/pom.xml
+  s_63ba2ac8bf176a::t_dfacb80ae9a79a 41-46
+chunjun-connectors/chunjun-connector-jdbc-base/src/main/java/com/dtstack/chunjun/connector/jdbc/dialect/JdbcDialect.java
+  s_63ba2ac8bf176a::t_71037c6310ebb5 30,342,380,500-501
+chunjun-connectors/chunjun-connector-jdbc-base/src/main/java/com/dtstack/chunjun/connector/jdbc/source/JdbcInputFormat.java
+  s_63ba2ac8bf176a::t_13eed8c86c09b7 345
+chunjun-connectors/chunjun-connector-jdbc-base/src/main/java/com/dtstack/chunjun/connector/jdbc/util/SqlUtil.java
+  s_63ba2ac8bf176a::t_908f3ba7784150 29,31-32,36-129,146
+chunjun-connectors/chunjun-connector-jdbc-base/src/test/java/com/dtstack/chunjun/connector/jdbc/dialect/JdbcDialectTest.java
+  s_63ba2ac8bf176a::t_600712d3024c91 116,125-126,160,170-171
+chunjun-connectors/chunjun-connector-jdbc-base/src/test/java/com/dtstack/chunjun/connector/jdbc/util/CustomSqlNormalizationTest.java
+  s_63ba2ac8bf176a::t_cb6d6d6c82d3e3 1-61
+chunjun-connectors/chunjun-connector-jdbc-base/src/test/java/com/dtstack/chunjun/connector/jdbc/util/CustomSqlWrapperTest.java
+  s_63ba2ac8bf176a::t_a2f2227ad849e0 1-130
+chunjun-connectors/chunjun-connector-opengauss/src/main/java/com/dtstack/chunjun/connector/opengauss/dialect/OpengaussDialect.java
+  s_63ba2ac8bf176a::t_34170e4f29921f 25,127
+chunjun-connectors/chunjun-connector-opengauss/src/test/java/com/dtstack/chunjun/connector/opengauss/dialect/CustomSqlDialectTest.java
+  s_63ba2ac8bf176a::t_174f2891a4d948 1-36
+chunjun-connectors/chunjun-connector-postgresql/src/main/java/com/dtstack/chunjun/connector/postgresql/dialect/PostgresqlDialect.java
+  s_63ba2ac8bf176a::t_2d97845c939dc5 26,129
+chunjun-connectors/chunjun-connector-postgresql/src/test/java/com/dtstack/chunjun/connector/postgresql/dialect/CustomSqlDialectTest.java
+  s_63ba2ac8bf176a::t_9dd62dc5ea483c 1-36
+chunjun-connectors/chunjun-connector-sqlserver/src/main/java/com/dtstack/chunjun/connector/sqlserver/dialect/SqlserverDialect.java
+  s_63ba2ac8bf176a::t_2d91e169bf43c0 28,148
+chunjun-connectors/chunjun-connector-sqlserver/src/test/java/com/dtstack/chunjun/connector/sqlserver/dialect/CustomSqlDialectTest.java
+  s_63ba2ac8bf176a::t_d434a2faafe930 1-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "068f93d623122ad3a39025690b7c25081871c341",
+  "prompts": {},
+  "sessions": {
+    "s_63ba2ac8bf176a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e4561cf5-afbf-47d8-813c-94a9a198c344",
+        "model": "unknown"
+      },
+      "human_author": "dujie <dujie@dtstack.com>"
+    }
+  }
+}
