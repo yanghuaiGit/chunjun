@@ -1,0 +1,27 @@
+"docs/docs_en/ChunJun Connector/mysql/mysql-sink.md"
+  s_63ba2ac8bf176a::t_334fbff5e262ac 250-254
+docs/docs_zh/ChunJun连接器/mysql/mysql-sink.md
+  s_63ba2ac8bf176a::t_2caf3f16d403f9 250-254
+chunjun-connectors/chunjun-connector-jdbc-base/pom.xml
+  s_63ba2ac8bf176a::t_1e287d84635e25 41-46
+chunjun-connectors/chunjun-connector-jdbc-base/src/main/java/com/dtstack/chunjun/connector/jdbc/sink/JdbcOutputFormat.java
+  s_63ba2ac8bf176a::t_0b081297e80683 94-95,106-116
+chunjun-connectors/chunjun-connector-jdbc-base/src/test/java/com/dtstack/chunjun/connector/jdbc/sink/JdbcWriteKeyValidationTest.java
+  s_63ba2ac8bf176a::t_3a7234a8951dcb 1-157
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9a27c1425370667aaf20fa8b07d6da5330e3f1d5",
+  "prompts": {},
+  "sessions": {
+    "s_63ba2ac8bf176a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e4561cf5-afbf-47d8-813c-94a9a198c344",
+        "model": "glm-5.3"
+      },
+      "human_author": "dujie <dujie@dtstack.com>"
+    }
+  }
+}
