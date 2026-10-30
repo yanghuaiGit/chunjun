@@ -49,6 +49,11 @@ import java.util.stream.Collectors;
 
 public class OracleDialect implements JdbcDialect {
 
+    @Override
+    public String numericStringExpression(String column) {
+        return "CAST(" + column + " AS NUMBER(38,0))";
+    }
+
     private static final long serialVersionUID = -1304861371329709477L;
 
     @Override

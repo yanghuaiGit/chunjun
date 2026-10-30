@@ -153,6 +153,15 @@ public class SqlUtil {
 
     public static String buildOrderSql(
             String originalSql, JdbcConfig jdbcConf, JdbcDialect jdbcDialect, String sortRule) {
+        if (jdbcConf.isNumericStringIncrement()) {
+            String order =
+                    " ORDER BY "
+                            + jdbcDialect.numericStringExpression(
+                                    jdbcDialect.quoteIdentifier(jdbcConf.getIncreColumn()))
+                            + " "
+                            + sortRule;
+            return originalSql.endsWith(order) ? originalSql : originalSql + order;
+        }
         String column;
         // 增量任务
         if (jdbcConf.isIncrement() && jdbcConf.isOrderBy() && !originalSql.contains("ORDER BY")) {

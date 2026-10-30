@@ -52,6 +52,11 @@ public class MysqlDialect implements JdbcDialect {
     }
 
     @Override
+    public String numericStringExpression(String column) {
+        return "CAST(" + column + " AS DECIMAL(38,0))";
+    }
+
+    @Override
     public boolean canHandle(String url) {
         return url.startsWith("jdbc:mysql:");
     }

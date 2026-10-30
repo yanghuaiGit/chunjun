@@ -349,3 +349,25 @@ mysql5.x
 ## 六、脚本示例
 
 见项目内`chunjun-examples`文件夹。
+
+
+### Numeric string increment (JSON tasks)
+
+`numericStringIncrement` is an optional JSON reader parameter, default `false`, for MySQL and Oracle. When enabled, a character `increColumn` is compared and ordered numerically with an exact decimal cast (precision 38). Existing numeric/date increment behavior is unchanged when disabled. This option is not a SQL connector option.
+
+Use one reader channel, `isOrderBy: true` (default), and an explicit `startLocation`. Do not set `orderByColumn`, a different `splitPk`, `useMaxFunc`, or `pollingFromMax`. Bounded reads and polling are supported. Positions must contain 1–38 ASCII digits, without signs, fractions, whitespace or exponents. Non-null source values must satisfy the same constraint; enforce this in the source schema. MySQL may coerce malformed values during CAST before the reader can reject them. NULL positions are not read.
+
+Numeric positions must be unique and increase as records arrive. Leading zeros remain in row payloads but are normalized in positions: `2` and `0002` represent the same position. Reading and checkpoint recovery use strict `>` comparison, so rows arriving at an already consumed position are not read. Do not reuse checkpoints from a different increment mode. Casting the column can prevent ordinary index range scans; assess the query plan on the target database.
+
+Add these parameters to the existing JSON reader (the `id` field must be declared as `varchar` in `column`):
+
+```json
+{
+  "numericStringIncrement": true,
+  "increColumn": "id",
+  "startLocation": "9223372036854775808",
+  "polling": true
+}
+```
+
+Set `job.setting.speed.channel` to `1`. The example above is a reader-parameter fragment, not a complete job.

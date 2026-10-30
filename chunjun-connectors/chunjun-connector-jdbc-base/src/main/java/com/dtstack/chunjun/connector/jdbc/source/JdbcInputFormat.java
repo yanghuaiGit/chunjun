@@ -91,6 +91,7 @@ public class JdbcInputFormat extends BaseRichInputFormat {
 
     @Override
     public void openInternal(InputSplit inputSplit) {
+        jdbcConfig.validateNumericStringIncrement();
         this.currentJdbcInputSplit = (JdbcInputSplit) inputSplit;
         initMetric(currentJdbcInputSplit);
         if (!canReadData(currentJdbcInputSplit)) {
@@ -485,6 +486,10 @@ public class JdbcInputFormat extends BaseRichInputFormat {
             return null;
         }
 
+        if (jdbcConfig.isNumericStringIncrement()) {
+            incrementCol = jdbcDialect.numericStringExpression(incrementCol);
+        }
+
         String operator = useMaxFunc ? " >= " : " > ";
 
         // 增量轮询，startLocation使用占位符代替
@@ -786,10 +791,14 @@ public class JdbcInputFormat extends BaseRichInputFormat {
             boolean isPolling,
             String location) {
         StringBuilder sql = new StringBuilder(64);
+        String columnReference = columnName;
         if (StringUtils.isNotEmpty(customSql)) {
-            sql.append(JdbcUtil.TEMPORARY_TABLE_NAME).append(".");
+            columnReference = JdbcUtil.TEMPORARY_TABLE_NAME + "." + columnName;
         }
-        sql.append(columnName).append(" ").append(operator).append(" ");
+        if (jdbcConfig.isNumericStringIncrement()) {
+            columnReference = jdbcDialect.numericStringExpression(columnReference);
+        }
+        sql.append(columnReference).append(" ").append(operator).append(" ");
         if (isPolling) {
             // 轮询任务使用占位符
             sql.append("?");

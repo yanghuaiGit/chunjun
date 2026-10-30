@@ -29,10 +29,12 @@ import com.dtstack.chunjun.connector.jdbc.dialect.JdbcDialect;
 import com.dtstack.chunjun.connector.jdbc.exclusion.FieldNameExclusionStrategy;
 import com.dtstack.chunjun.connector.jdbc.util.JdbcUtil;
 import com.dtstack.chunjun.connector.jdbc.util.key.KeyUtil;
+import com.dtstack.chunjun.connector.jdbc.util.key.NumericStringTypeUtil;
 import com.dtstack.chunjun.connector.jdbc.util.key.NumericTypeUtil;
 import com.dtstack.chunjun.constants.ConstantValue;
 import com.dtstack.chunjun.converter.AbstractRowConverter;
 import com.dtstack.chunjun.converter.RawTypeMapper;
+import com.dtstack.chunjun.enums.ColumnType;
 import com.dtstack.chunjun.source.SourceFactory;
 import com.dtstack.chunjun.throwable.ChunJunRuntimeException;
 import com.dtstack.chunjun.util.GsonUtil;
@@ -94,6 +96,13 @@ public abstract class JdbcSourceFactory extends SourceFactory {
 
         setDefaultSplitStrategy(jdbcConfig);
         super.initCommonConf(jdbcConfig);
+        jdbcConfig.validateNumericStringIncrement();
+        if (jdbcConfig.isNumericStringIncrement()) {
+            // Check dialect support before opening any database connection.
+            jdbcDialect.numericStringExpression(
+                    jdbcDialect.quoteIdentifier(jdbcConfig.getIncreColumn()));
+        }
+
         if (StringUtils.isBlank(jdbcConfig.getCustomSql())) {
             rebuildJdbcConf();
         }
@@ -203,7 +212,11 @@ public abstract class JdbcSourceFactory extends SourceFactory {
                 jdbcConfig.setRestoreColumnIndex(fieldConfig.getIndex());
                 jdbcConfig.setRestoreColumnType(fieldConfig.getType().getType());
                 restoreKeyUtil =
-                        jdbcDialect.initKeyUtil(fieldConfig.getName(), fieldConfig.getType());
+                        jdbcConfig.isNumericStringIncrement()
+                                        && name.equals(jdbcConfig.getIncreColumn())
+                                ? new NumericStringTypeUtil()
+                                : jdbcDialect.initKeyUtil(
+                                        fieldConfig.getName(), fieldConfig.getType());
             } else {
                 throw new IllegalArgumentException("unknown restore column name: " + name);
             }
@@ -269,7 +282,17 @@ public abstract class JdbcSourceFactory extends SourceFactory {
             jdbcConfig.setRestoreColumnType(type.getType());
             jdbcConfig.setRestoreColumnIndex(index);
 
-            incrementKeyUtil = jdbcDialect.initKeyUtil(name, type);
+            if (jdbcConfig.isNumericStringIncrement()) {
+                if (!ColumnType.isStringType(type.getType())) {
+                    throw new IllegalArgumentException(
+                            "numericStringIncrement requires a character increment column");
+                }
+                incrementKeyUtil = new NumericStringTypeUtil();
+                jdbcConfig.setSplitPk(name);
+                splitKeyUtil = incrementKeyUtil;
+            } else {
+                incrementKeyUtil = jdbcDialect.initKeyUtil(name, type);
+            }
             restoreKeyUtil = incrementKeyUtil;
             initStartLocation();
 
@@ -281,6 +304,9 @@ public abstract class JdbcSourceFactory extends SourceFactory {
     }
 
     public void initSplitConfig() {
+        if (jdbcConfig.isNumericStringIncrement()) {
+            return;
+        }
         String splitPk = jdbcConfig.getSplitPk();
         if (StringUtils.isNotBlank(splitPk)) {
             jdbcConfig.getColumn().stream()

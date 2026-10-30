@@ -62,6 +62,8 @@ public class JdbcConfig extends CommonConfig implements Serializable {
     protected int connectTimeOut = 0;
     /** 是否为增量任务 */
     protected boolean increment = false;
+    /** Opt-in JSON reader mode for exact numeric positions stored in character columns. */
+    protected boolean numericStringIncrement = false;
     /** 是否为增量轮询 */
     protected boolean polling = false;
 
@@ -115,6 +117,23 @@ public class JdbcConfig extends CommonConfig implements Serializable {
 
     public void setInitReporter(Boolean initReporter) {
         this.initReporter = initReporter;
+    }
+
+    public void validateNumericStringIncrement() {
+        if (!numericStringIncrement) {
+            return;
+        }
+        if (getParallelism() != 1
+                || StringUtils.isBlank(increColumn)
+                || StringUtils.isBlank(startLocation)
+                || (StringUtils.isNotBlank(splitPk) && !splitPk.equals(increColumn))
+                || !isOrderBy
+                || StringUtils.isNotBlank(orderByColumn)
+                || useMaxFunc
+                || pollingFromMax) {
+            throw new IllegalArgumentException(
+                    "numericStringIncrement requires one reader channel, increColumn, an explicit startLocation, ordered reading, and no independent splitPk/orderByColumn or maximum-based startup");
+        }
     }
 
     public String getFieldDelim() {

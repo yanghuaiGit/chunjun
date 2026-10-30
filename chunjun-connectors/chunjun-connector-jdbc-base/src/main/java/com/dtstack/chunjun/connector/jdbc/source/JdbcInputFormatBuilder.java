@@ -54,6 +54,7 @@ public class JdbcInputFormatBuilder extends BaseRichInputFormatBuilder<JdbcInput
 
     @Override
     protected void checkFormat() {
+        format.jdbcConfig.validateNumericStringIncrement();
         JdbcConfig conf = format.getJdbcConfig();
         StringBuilder sb = new StringBuilder(256);
         if (StringUtils.isBlank(conf.getUsername())) {

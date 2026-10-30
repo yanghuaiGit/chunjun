@@ -72,6 +72,12 @@ public interface JdbcDialect extends Serializable {
      */
     String dialectName();
 
+    /** Numeric comparison/order expression for opt-in JSON numeric-string positions. */
+    default String numericStringExpression(String column) {
+        throw new UnsupportedOperationException(
+                "Numeric string increments are not supported by " + dialectName());
+    }
+
     /**
      * Check if this dialect instance can handle a certain jdbc url.
      *
