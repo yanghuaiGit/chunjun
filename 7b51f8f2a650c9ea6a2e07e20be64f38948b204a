@@ -1,0 +1,23 @@
+chunjun-connectors/chunjun-connector-jdbc-base/pom.xml
+  s_63ba2ac8bf176a::t_219c5247f4e47e 41-46
+chunjun-connectors/chunjun-connector-jdbc-base/src/main/java/com/dtstack/chunjun/connector/jdbc/source/distribute/DistributedJdbcInputFormat.java
+  s_63ba2ac8bf176a::t_62bb7cff8df163 50-51
+chunjun-connectors/chunjun-connector-jdbc-base/src/test/java/com/dtstack/chunjun/connector/jdbc/source/distribute/DistributedJdbcSplitLifecycleTest.java
+  s_63ba2ac8bf176a::t_be06fe641cba17 1-145
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7b51f8f2a650c9ea6a2e07e20be64f38948b204a",
+  "prompts": {},
+  "sessions": {
+    "s_63ba2ac8bf176a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e4561cf5-afbf-47d8-813c-94a9a198c344",
+        "model": "unknown"
+      },
+      "human_author": "dujie <dujie@dtstack.com>"
+    }
+  }
+}
