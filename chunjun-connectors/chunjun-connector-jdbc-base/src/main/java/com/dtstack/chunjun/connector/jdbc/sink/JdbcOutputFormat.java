@@ -91,7 +91,8 @@ public class JdbcOutputFormat extends BaseRichOutputFormat {
             dbConn = getConnection();
             // 默认关闭事务自动提交，手动控制事务
             dbConn.setAutoCommit(jdbcConfig.isAutoCommit());
-            if (!EWriteMode.INSERT.name().equalsIgnoreCase(jdbcConfig.getMode())) {
+            if (!EWriteMode.INSERT.name().equalsIgnoreCase(jdbcConfig.getMode())
+                    && !"*".equals(jdbcConfig.getTable())) {
                 List<String> updateKey = jdbcConfig.getUniqueKey();
                 if (CollectionUtils.isEmpty(updateKey)) {
                     List<String> tableIndex =
@@ -101,6 +102,17 @@ public class JdbcOutputFormat extends BaseRichOutputFormat {
                                     dbConn);
                     jdbcConfig.setUniqueKey(tableIndex);
                     log.info("updateKey = {}", JsonUtil.toJson(tableIndex));
+                }
+                boolean requiresKey =
+                        EWriteMode.UPDATE.name().equalsIgnoreCase(jdbcConfig.getMode())
+                                || EWriteMode.UPSERT.name().equalsIgnoreCase(jdbcConfig.getMode());
+                if (requiresKey && CollectionUtils.isEmpty(jdbcConfig.getUniqueKey())) {
+                    JdbcUtil.closeDbResources(null, null, dbConn, false);
+                    dbConn = null;
+                    throw new IllegalArgumentException(
+                            String.format(
+                                    "Write mode [%s] requires uniqueKey, but table [%s] has neither a configured key nor a primary key or unique index.",
+                                    jdbcConfig.getMode(), jdbcConfig.getTable()));
                 }
             }
 

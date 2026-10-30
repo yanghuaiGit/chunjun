@@ -247,3 +247,8 @@ mysql5.x
 ## 六、脚本示例
 
 见项目内`chunjun-examples`文件夹。
+
+
+### JDBC write-key validation
+
+For a static table, JDBC `UPDATE` and `UPSERT` modes require a nonempty `uniqueKey`. If it is omitted, the writer attempts to infer a primary key or unique index from database metadata. If none exists, startup fails before preparing write statements and closes the connection. Configure `uniqueKey` or create an appropriate database key before retrying. This check does not change `INSERT` or `REPLACE` behavior. Dynamic multi-table writing (`table: "*"`) does not perform this static-table metadata check.
